@@ -1,0 +1,10 @@
+class Solution {
+    public boolean checkTwoChessboards(String coordinate1, String coordinate2) {
+        return isBlack(coordinate1)==isBlack(coordinate2);
+    }
+    private static boolean isBlack(String coordinate){
+        int column = coordinate.charAt(0)-'a';
+        int row = coordinate.charAt(1)-'1';
+        return(column+row)%2==0;
+    }
+}
