@@ -1,0 +1,59 @@
+import java.util.*;
+
+public class Solution {
+    public int maxScore(List<List<Integer>> grid) {
+        int R = grid.size();
+        int C = grid.get(0).size();
+
+        // 对每一行排序，降序排列
+        for (List<Integer> row : grid) {
+            Collections.sort(row, Collections.reverseOrder());
+        }
+
+        // 构建lookup表
+        int[][] lookup = new int[R][102];
+        for (int i = 0; i < R; i++) {
+            Arrays.fill(lookup[i], C);
+        }
+
+        for (int k = 0; k < 102; k++) {
+            for (int i = 0; i < R; i++) {
+                for (int j = 0; j < C; j++) {
+                    if (grid.get(i).get(j) < k) {
+                        lookup[i][k] = j;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 使用动态规划 + 位掩码缓存的递归方法
+        return go(0, 101, 0, R, C, grid, lookup, new HashMap<>());
+    }
+
+    private int go(int used, int last, int count, int R, int C, List<List<Integer>> grid, int[][] lookup, Map<String, Integer> memo) {
+        if (count == R) {
+            return 0;
+        }
+
+        String key = used + "," + last + "," + count;
+        if (memo.containsKey(key)) {
+            return memo.get(key);
+        }
+
+        int best = 0;
+        for (int i = 0; i < R; i++) {
+            if ((used & (1 << i)) == 0) {
+                int index = lookup[i][last];
+                if (index < C) {
+                    int score = go(used | (1 << i), grid.get(i).get(index), count + 1, R, C, grid, lookup, memo) + grid.get(i).get(index);
+                    best = Math.max(best, score);
+                }
+            }
+        }
+
+        memo.put(key, best);
+        return best;
+    }
+
+}
